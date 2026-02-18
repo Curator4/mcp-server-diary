@@ -86,7 +86,7 @@ func handleGetNutritionSummary(ctx context.Context, req *mcp.CallToolRequest, in
 		return nil, NutritionSummaryOutput{}, err
 	}
 
-	var days []NutritionDay
+	days := []NutritionDay{}
 	grandTotalCal := 0
 	grandTotalPro := 0
 
@@ -129,6 +129,7 @@ func handleGetNutritionSummary(ctx context.Context, req *mcp.CallToolRequest, in
 }
 
 // parseNutritionEntries parses lines like "- 09:15 | overnight oats | 450 kcal | 15g protein"
+// Also handles freeform entries like "- ate a bag of popcorn" (captured with 0 macros).
 func parseNutritionEntries(section string) []NutritionEntry {
 	var entries []NutritionEntry
 
@@ -140,18 +141,24 @@ func parseNutritionEntries(section string) []NutritionEntry {
 		line = strings.TrimPrefix(line, "- ")
 
 		parts := strings.Split(line, " | ")
-		if len(parts) < 4 {
+
+		// structured: "HH:MM | desc | 450 kcal | 15g protein"
+		if len(parts) >= 4 {
+			cal, _ := strconv.Atoi(strings.TrimSuffix(strings.TrimSpace(parts[2]), " kcal"))
+			pro, _ := strconv.Atoi(strings.TrimSuffix(strings.TrimSpace(parts[3]), "g protein"))
+
+			entries = append(entries, NutritionEntry{
+				Time:        strings.TrimSpace(parts[0]),
+				Description: strings.TrimSpace(parts[1]),
+				Calories:    cal,
+				Protein:     pro,
+			})
 			continue
 		}
 
-		cal, _ := strconv.Atoi(strings.TrimSuffix(strings.TrimSpace(parts[2]), " kcal"))
-		pro, _ := strconv.Atoi(strings.TrimSuffix(strings.TrimSpace(parts[3]), "g protein"))
-
+		// freeform: anything else — capture as description, 0 macros
 		entries = append(entries, NutritionEntry{
-			Time:        strings.TrimSpace(parts[0]),
-			Description: strings.TrimSpace(parts[1]),
-			Calories:    cal,
-			Protein:     pro,
+			Description: strings.TrimSpace(line),
 		})
 	}
 

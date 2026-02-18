@@ -30,6 +30,10 @@ func main() {
 	mcp.AddTool(server, &mcp.Tool{Name: "logWorkout", Description: "log a workout to today's diary note under ## workout"}, handleLogWorkout)
 	mcp.AddTool(server, &mcp.Tool{Name: "getWorkoutSummary", Description: "get workout entries for a date range"}, handleGetWorkoutSummary)
 
+	// stats
+	mcp.AddTool(server, &mcp.Tool{Name: "logWeight", Description: "log weight (kg) to today's diary note under ## stats"}, handleLogWeight)
+	mcp.AddTool(server, &mcp.Tool{Name: "getWeightSummary", Description: "get weight entries and trends for a date range"}, handleGetWeightSummary)
+
 	// meal reference
 	mcp.AddTool(server, &mcp.Tool{Name: "addMealReference", Description: "add or update a meal in the reference database with macros"}, handleAddMealReference)
 	mcp.AddTool(server, &mcp.Tool{Name: "getMealReference", Description: "look up meals from the reference database (substring search or list all)"}, handleGetMealReference)

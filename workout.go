@@ -74,7 +74,7 @@ func handleGetWorkoutSummary(ctx context.Context, req *mcp.CallToolRequest, inpu
 		return nil, WorkoutSummaryOutput{}, err
 	}
 
-	var days []WorkoutDay
+	days := []WorkoutDay{}
 	totalCount := 0
 
 	for _, date := range dates {

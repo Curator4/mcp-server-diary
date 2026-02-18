@@ -119,16 +119,21 @@ func ensureDailyNote(date time.Time) (string, error) {
 	// write template
 	y := date.Format("2006")
 	d := date.Format("2006-01-02")
+	weekday := date.Format("Monday")
+	_, week := date.ISOWeek()
 	template := fmt.Sprintf(`# entry: %s
 
 Tags: #themis #%s
+%s · Week %02d · [[reference]]
 
 ## log
 
 ## nutrition
 
 ## workout
-`, d, y)
+
+## stats
+`, d, y, weekday, week)
 
 	if err := os.WriteFile(path, []byte(template), 0644); err != nil {
 		return "", fmt.Errorf("failed to create daily note: %w", err)
